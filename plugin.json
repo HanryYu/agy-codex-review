@@ -1,0 +1,10 @@
+{
+  "$schema": "https://antigravity.google/schemas/v1/plugin.json",
+  "name": "codex",
+  "displayName": "Codex Review",
+  "version": "1.2.0",
+  "description": "Run OpenAI's official Codex companion v1.0.6 for read-only reviews and manage foreground and background review jobs.",
+  "repository": "https://github.com/HanryYu/agy-codex-review",
+  "license": "Apache-2.0",
+  "keywords": ["antigravity", "codex", "code-review"]
+}

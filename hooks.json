@@ -1,0 +1,11 @@
+{
+  "review-conversation": {
+    "SessionStart": [
+      {
+        "type": "command",
+        "command": "node -e 'const p = JSON.parse(require(\"node:fs\").readFileSync(0, \"utf8\")); const path = require(\"node:path\"); const cli = path.join(require(\"node:os\").homedir(), \".gemini\", \"antigravity-cli\") + path.sep; if (typeof p.artifactDirectoryPath === \"string\" && path.normalize(p.artifactDirectoryPath).startsWith(cli) && /^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(p.conversationId)) console.log(JSON.stringify({injectSteps:[{systemMessage:{systemMessage:\"For the Codex plugin MCP tools, always pass this exact agy conversation_id: \" + p.conversationId}}]}));'",
+        "timeout": 5
+      }
+    ]
+  }
+}

@@ -1,0 +1,12 @@
+agy-codex-review
+
+This distribution includes the Codex plugin for Claude Code from OpenAI,
+licensed under the Apache License, Version 2.0.
+
+Upstream: https://github.com/openai/codex-plugin-cc
+Version: v1.0.6
+Commit: db52e28f4d9ded852ab3942cea316258ae4ef346
+
+The vendored source is unmodified. The Antigravity CLI integration and skills
+are not part of the upstream OpenAI plugin. The upstream LICENSE and NOTICE
+are included under vendor/codex-plugin-cc-v1.0.6/plugins/codex/.

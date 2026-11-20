@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "local": {
+      "command": "node",
+      "args": ["${PLUGIN_ROOT}/scripts/review-mcp.mjs"],
+      "timeoutSeconds": -1,
+      "tools": {
+        "review": {"eager": true},
+        "adversarial_review": {"eager": true},
+        "status": {"eager": true},
+        "result": {"eager": true},
+        "cancel": {"eager": true},
+        "setup": {"eager": true}
+      }
+    }
+  }
+}
