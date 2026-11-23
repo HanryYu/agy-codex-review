@@ -30,6 +30,8 @@ const tools = Object.entries(commands).map(([name, [command, description]]) => (
       ...(command === 'task' ? {
         prompt: { type: 'string', description: 'The user’s task text verbatim, excluding the leading rescue flags.' },
         background: { type: 'boolean', description: 'Queue the task and return its job ID.' },
+        model: { type: 'string', description: 'Codex model override from --model. Omit to use the configured default.' },
+        effort: { type: 'string', description: 'Codex reasoning effort override from --effort. Omit to use the configured default.' },
       } : { arguments: { type: 'string', description: 'The raw slash command argument tail, verbatim; empty if omitted.' } }),
       conversation_id: { type: 'string', description: 'Exact agy conversation ID from the Codex SessionStart hook.' },
       ...(isReview(command) ? { mode: { enum: ['inspect', 'wait', 'background'], description: 'Inspect only if neither mode flag was supplied and the user has not chosen yet.' } } : {}),
@@ -86,7 +88,7 @@ async function execute(request, signal) {
   const action = request.name;
   if (!Object.hasOwn(commands, action)) throw new Error('Unknown Codex review tool.');
   const [command] = commands[action];
-  const { cwd, arguments: raw, mode, conversation_id: id, prompt, background: enqueue } = request.arguments ?? {};
+  const { cwd, arguments: raw, mode, conversation_id: id, prompt, background: enqueue, model, effort } = request.arguments ?? {};
   if (typeof cwd !== 'string' || !path.isAbsolute(cwd) || cwd.includes('\0')) {
     throw new Error('Pass the absolute path of the requested workspace.');
   }
@@ -98,8 +100,18 @@ async function execute(request, signal) {
     if (enqueue !== undefined && typeof enqueue !== 'boolean') {
       throw new Error('Pass background as a boolean.');
     }
-    // Do not parse the prompt as companion options or shell syntax.
-    argv = [...(action === 'rescue_write' ? ['--write'] : []), ...(enqueue ? ['--background'] : []), '--', prompt];
+    argv = [];
+    if (action === 'rescue_write') argv.push('--write');
+    if (enqueue) argv.push('--background');
+    for (const [flag, value] of [['--model', model], ['--effort', effort]]) {
+      if (value === undefined) continue;
+      if (typeof value !== 'string' || !value.trim() || value.includes('\0')) {
+        throw new Error(`Pass a nonempty value for ${flag}.`);
+      }
+      argv.push(flag, value);
+    }
+    // Keep the task text out of the companion's option parser.
+    argv.push('--', prompt);
   } else {
     if (typeof raw !== 'string' || raw.includes('\0')) throw new Error('Pass the exact slash-command arguments.');
     argv = [raw];
@@ -161,7 +173,7 @@ input.on('line', line => {
   if (id == null) return;
   if (method === 'initialize') return send(id, { result: {
     protocolVersion: params.protocolVersion ?? '2024-11-05', capabilities: { tools: {} },
-    serverInfo: { name: 'codex-review-agy-adapter', version: '1.3.0' },
+    serverInfo: { name: 'codex-review-agy-adapter', version: '1.4.0' },
   } });
   if (method === 'ping') return send(id, { result: {} });
   if (method === 'tools/list') return send(id, { result: { tools } });

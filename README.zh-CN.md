@@ -65,8 +65,8 @@ cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/codex/SKILL.md ~/.gemini
 | :--- | :--- |
 | `/codex:review [options]` | 执行原生只读代码审查 |
 | `/codex:adversarial-review [options] [focus]` | 执行对抗式审查（可附加审查重点） |
-| `/codex:rescue [--write] [--background] <任务>` | 把任务直接交给 Codex。默认只读，`--write` 允许修改工作区。 |
-| `/codex [--read-only] [--background] <任务>` | 可选快捷命令，默认允许修改工作区。加 `--read-only` 切换到只读。 |
+| `/codex:rescue [选项] <任务>` | 把任务直接交给 Codex。默认只读，`--write` 允许修改工作区。 |
+| `/codex [选项] <任务>` | 可选快捷命令，默认允许修改工作区。加 `--read-only` 切换到只读。 |
 | `/codex:status [job-id]` | 查看当前仓库的任务列表或单个任务状态 |
 | `/codex:result [job-id]` | 查看已完成任务的完整结果 |
 | `/codex:cancel [job-id]` | 取消正在运行的 Codex 任务 |
@@ -89,7 +89,8 @@ cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/codex/SKILL.md ~/.gemini
 插件本身不硬编码模型，默认直接沿用本机 Codex CLI 的配置（`~/.codex/config.toml`）。
 
 - **修改默认模型**：在 `~/.codex/config.toml` 中调整 `model`（以及可选的 `model_reasoning_effort`）。
-- **单次临时指定**：在 `/codex:review` 或 `/codex:adversarial-review` 中传入 `--model <model>` 或 `-m <model>` 覆盖默认模型。
+- **任务**：在 `/codex` 或 `/codex:rescue` 的任务文本前加 `--model <模型>`、`--effort <强度>`，两项可独立指定。强度取值为 `none`、`minimal`、`low`、`medium`、`high`、`xhigh`，具体支持哪些档位取决于模型。
+- **审查**：用 `/codex:review` 或 `/codex:adversarial-review` 时，可以加 `--model <模型>` 或 `-m <模型>`。
 
 ### 使用示例
 
@@ -110,7 +111,7 @@ cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/codex/SKILL.md ~/.gemini
 /codex --read-only 分析测试失败的原因
 
 # 允许 Codex 修改工作区，在后台运行并返回任务 ID
-/codex --background 修复失败的测试
+/codex --model gpt-6.2-sol --effort high --background 修复失败的测试
 
 # 查看任务进度并获取完整审查报告
 /codex:status

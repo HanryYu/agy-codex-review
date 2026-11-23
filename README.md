@@ -65,8 +65,8 @@ All commands are explicitly invoked as slash commands in `agy`:
 | :--- | :--- |
 | `/codex:review [options]` | Run a native read-only Codex review |
 | `/codex:adversarial-review [options] [focus]` | Run an adversarial review with optional focus text |
-| `/codex:rescue [--write] [--background] <task>` | Send a task to Codex. Read-only by default; `--write` enables workspace edits. |
-| `/codex [--read-only] [--background] <task>` | Optional shortcut that allows workspace edits by default. Use `--read-only` to prevent edits. |
+| `/codex:rescue [options] <task>` | Send a task to Codex. Read-only by default; `--write` enables workspace edits. |
+| `/codex [options] <task>` | Optional shortcut that allows workspace edits by default. Use `--read-only` to prevent edits. |
 | `/codex:status [job-id]` | Show active/recent jobs for this repo, or details for one job |
 | `/codex:result [job-id]` | Show the full stored result of a completed job |
 | `/codex:cancel [job-id]` | Cancel a running Codex job |
@@ -89,7 +89,8 @@ Both `/codex` and `/codex:rescue` wait for the result unless you pass `--backgro
 The plugin does not hardcode a model. By default, it inherits the model and reasoning settings from your local Codex CLI configuration (`~/.codex/config.toml`).
 
 - **Change default model**: Edit `model` (and optionally `model_reasoning_effort`) in `~/.codex/config.toml`.
-- **Override per run**: Pass `--model <model>` or `-m <model>` to `/codex:review` or `/codex:adversarial-review`.
+- **Tasks**: Use `--model <model>` and/or `--effort <level>` before the task text in `/codex` or `/codex:rescue`. Effort levels are `none`, `minimal`, `low`, `medium`, `high`, and `xhigh`; available levels depend on the model.
+- **Reviews**: Use `--model <model>` or `-m <model>` with `/codex:review` or `/codex:adversarial-review`.
 
 ### Examples
 
@@ -110,7 +111,7 @@ The plugin does not hardcode a model. By default, it inherits the model and reas
 /codex --read-only Explain why the tests fail
 
 # Let Codex edit the workspace and return a background job ID
-/codex --background Fix the failing tests
+/codex --model gpt-6.2-sol --effort high --background Fix the failing tests
 
 # Check job status and retrieve the full report
 /codex:status

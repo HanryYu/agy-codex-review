@@ -4,9 +4,11 @@ description: Send an implementation or investigation task directly to Codex. Use
 disable-model-invocation: true
 ---
 
-`/codex:rescue [--write] [--background] <task>`
+`/codex:rescue [--model <model>] [--effort <level>] [--write] [--background] <task>`
 
 Use `mcp_codex_local_rescue` by default. Use `mcp_codex_local_rescue_write` only if the user supplies the leading `--write` flag; that tool lets Codex edit the workspace. If the request needs edits but lacks `--write`, ask the user to rerun with it instead of granting write access yourself.
+
+Pass leading `--model <model>` as `model` and leading `--effort <level>` as `effort`. Omit either field if its flag was not supplied; do not infer a value. If either flag is missing its value, ask before calling the tool.
 
 Pass the task text unchanged as `prompt`, without the leading flags. Use the active workspace's absolute path as `cwd` and the exact `conversation_id` from the Codex SessionStart hook if available. Set `background: true` only for a leading `--background`. If no task is provided, ask what Codex should do.
 
