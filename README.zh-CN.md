@@ -2,7 +2,7 @@
 
 [English](./README.md) | 简体中文
 
-一个用于 **[Antigravity CLI (`agy`)](https://antigravity.google)** 的插件，通过本地 MCP 服务接入 OpenAI 官方的只读 Codex 代码审查工具（基于 `codex-plugin-cc` v1.0.6），支持在 `agy` 中直接发起代码审查与后台任务管理。
+一个用于 **[Antigravity CLI (`agy`)](https://antigravity.google)** 的插件，通过本地 MCP 服务调用 OpenAI 官方 Codex，执行代码审查或编码任务（基于 `codex-plugin-cc` v1.0.6）。
 
 ## 功能特性
 
@@ -63,9 +63,10 @@ cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/review/SKILL.md ~/.gemin
 | :--- | :--- |
 | `/codex:review [options]` | 执行原生只读代码审查 |
 | `/codex:adversarial-review [options] [focus]` | 执行对抗式审查（可附加审查重点） |
-| `/codex:status [job-id]` | 查看当前仓库的审查任务列表或单个任务状态 |
-| `/codex:result [job-id]` | 查看已完成任务的完整审查结果 |
-| `/codex:cancel [job-id]` | 取消正在运行的审查任务 |
+| `/codex:rescue [--write] [--background] <任务>` | 把任务直接交给 Codex。默认只读，`--write` 允许修改工作区。 |
+| `/codex:status [job-id]` | 查看当前仓库的任务列表或单个任务状态 |
+| `/codex:result [job-id]` | 查看已完成任务的完整结果 |
+| `/codex:cancel [job-id]` | 取消正在运行的 Codex 任务 |
 | `/codex:setup` | 检查 Codex 环境与登录状态 |
 
 ### 常用参数
@@ -77,6 +78,8 @@ cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/review/SKILL.md ~/.gemin
 - `-m, --model <model>`：为本次审查临时指定模型。
 
 > 未指定 `--wait` 或 `--background` 时，插件会先统计改动文件数和行数：改动较小（1–2 个文件且 ≤ 100 行）时推荐前台等待，较大时推荐后台运行。
+
+`/codex:rescue` 默认在前台等待。选项放在任务文本之前。后台任务可用 `/codex:status <job-id>` 查进度，用 `/codex:result <job-id>` 取结果。
 
 ### 模型设置
 
@@ -99,6 +102,12 @@ cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/review/SKILL.md ~/.gemin
 
 # 针对权限校验与边界条件进行对抗式审查
 /codex:adversarial-review --wait focus on auth checks and error handling
+
+# 让 Codex 排查，但不修改文件
+/codex:rescue 分析测试失败的原因
+
+# 允许 Codex 修改工作区，在后台运行并返回任务 ID
+/codex:rescue --write --background 修复失败的测试
 
 # 查看任务进度并获取完整审查报告
 /codex:status

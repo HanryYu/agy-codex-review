@@ -2,7 +2,7 @@
 
 English | [简体中文](./README.zh-CN.md)
 
-An [Antigravity CLI (`agy`)](https://antigravity.google) plugin that integrates OpenAI's official read-only Codex code reviewer (`codex-plugin-cc` v1.0.6) via a local MCP server.
+An [Antigravity CLI (`agy`)](https://antigravity.google) plugin that runs OpenAI's official Codex reviews and coding tasks through a local MCP server (`codex-plugin-cc` v1.0.6).
 
 ## Features
 
@@ -63,9 +63,10 @@ All commands are explicitly invoked as slash commands in `agy`:
 | :--- | :--- |
 | `/codex:review [options]` | Run a native read-only Codex review |
 | `/codex:adversarial-review [options] [focus]` | Run an adversarial review with optional focus text |
+| `/codex:rescue [--write] [--background] <task>` | Send a task to Codex. Read-only by default; `--write` enables workspace edits. |
 | `/codex:status [job-id]` | Show active/recent jobs for this repo, or details for one job |
 | `/codex:result [job-id]` | Show the full stored result of a completed job |
-| `/codex:cancel [job-id]` | Cancel a running review job |
+| `/codex:cancel [job-id]` | Cancel a running Codex job |
 | `/codex:setup` | Check Codex runtime and authentication readiness |
 
 ### Common Options
@@ -77,6 +78,8 @@ All commands are explicitly invoked as slash commands in `agy`:
 - `-m, --model <model>`: Override the model for this review run.
 
 > If neither `--wait` nor `--background` is provided, the plugin inspects the diff first and recommends waiting for small changes (1–2 files and ≤ 100 lines) or running in the background for larger diffs.
+
+For `/codex:rescue`, omit `--background` to wait for the result. Put any flags before the task text. Use `/codex:status <job-id>` and `/codex:result <job-id>` for background tasks.
 
 ### Model Configuration
 
@@ -99,6 +102,12 @@ The plugin does not hardcode a model. By default, it inherits the model and reas
 
 # Adversarial review with custom focus
 /codex:adversarial-review --wait focus on auth checks and error handling
+
+# Ask Codex to investigate without editing
+/codex:rescue Explain why the tests fail
+
+# Let Codex edit the workspace and return a background job ID
+/codex:rescue --write --background Fix the failing tests
 
 # Check job status and retrieve the full report
 /codex:status
