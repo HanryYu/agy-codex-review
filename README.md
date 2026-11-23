@@ -38,7 +38,7 @@ agy plugin install /tmp/agy-codex-review
 
 ### 2. Optional: Enable Shortcuts
 
-To use `/review` for `/codex:review` and `/codex` for `/codex:rescue` in `agy`:
+Enable `/review` as a shortcut for `/codex:review` and `/codex` as a write-enabled shortcut for `/codex:rescue`:
 
 ```bash
 mkdir -p ~/.gemini/antigravity-cli/skills/review
@@ -66,7 +66,7 @@ All commands are explicitly invoked as slash commands in `agy`:
 | `/codex:review [options]` | Run a native read-only Codex review |
 | `/codex:adversarial-review [options] [focus]` | Run an adversarial review with optional focus text |
 | `/codex:rescue [--write] [--background] <task>` | Send a task to Codex. Read-only by default; `--write` enables workspace edits. |
-| `/codex [--write] [--background] <task>` | Optional shorthand for `/codex:rescue`; same flags and permissions. |
+| `/codex [--read-only] [--background] <task>` | Optional shortcut that allows workspace edits by default. Use `--read-only` to prevent edits. |
 | `/codex:status [job-id]` | Show active/recent jobs for this repo, or details for one job |
 | `/codex:result [job-id]` | Show the full stored result of a completed job |
 | `/codex:cancel [job-id]` | Cancel a running Codex job |
@@ -82,7 +82,7 @@ All commands are explicitly invoked as slash commands in `agy`:
 
 > If neither `--wait` nor `--background` is provided, the plugin inspects the diff first and recommends waiting for small changes (1–2 files and ≤ 100 lines) or running in the background for larger diffs.
 
-For `/codex:rescue`, omit `--background` to wait for the result. Put any flags before the task text. Use `/codex:status <job-id>` and `/codex:result <job-id>` for background tasks.
+Both `/codex` and `/codex:rescue` wait for the result unless you pass `--background`. Put flags before the task text. Use `/codex:status <job-id>` and `/codex:result <job-id>` for background tasks.
 
 ### Model Configuration
 
@@ -107,10 +107,10 @@ The plugin does not hardcode a model. By default, it inherits the model and reas
 /codex:adversarial-review --wait focus on auth checks and error handling
 
 # Ask Codex to investigate without editing
-/codex:rescue Explain why the tests fail
+/codex --read-only Explain why the tests fail
 
 # Let Codex edit the workspace and return a background job ID
-/codex:rescue --write --background Fix the failing tests
+/codex --background Fix the failing tests
 
 # Check job status and retrieve the full report
 /codex:status

@@ -38,7 +38,7 @@ agy plugin install /tmp/agy-codex-review
 
 ### 2. 可选：启用快捷命令
 
-在 `agy` 中用 `/review` 代替 `/codex:review`，用 `/codex` 代替 `/codex:rescue`：
+在 `agy` 中用 `/review` 代替 `/codex:review`，用 `/codex` 快速把任务交给 Codex。`/codex` 默认允许编辑工作区：
 
 ```bash
 mkdir -p ~/.gemini/antigravity-cli/skills/review
@@ -66,7 +66,7 @@ cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/codex/SKILL.md ~/.gemini
 | `/codex:review [options]` | 执行原生只读代码审查 |
 | `/codex:adversarial-review [options] [focus]` | 执行对抗式审查（可附加审查重点） |
 | `/codex:rescue [--write] [--background] <任务>` | 把任务直接交给 Codex。默认只读，`--write` 允许修改工作区。 |
-| `/codex [--write] [--background] <任务>` | `/codex:rescue` 的可选快捷命令，参数和权限相同。 |
+| `/codex [--read-only] [--background] <任务>` | 可选快捷命令，默认允许修改工作区。加 `--read-only` 切换到只读。 |
 | `/codex:status [job-id]` | 查看当前仓库的任务列表或单个任务状态 |
 | `/codex:result [job-id]` | 查看已完成任务的完整结果 |
 | `/codex:cancel [job-id]` | 取消正在运行的 Codex 任务 |
@@ -82,7 +82,7 @@ cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/codex/SKILL.md ~/.gemini
 
 > 未指定 `--wait` 或 `--background` 时，插件会先统计改动文件数和行数：改动较小（1–2 个文件且 ≤ 100 行）时推荐前台等待，较大时推荐后台运行。
 
-`/codex:rescue` 默认在前台等待。选项放在任务文本之前。后台任务可用 `/codex:status <job-id>` 查进度，用 `/codex:result <job-id>` 取结果。
+`/codex` 和 `/codex:rescue` 默认在前台等待。选项放在任务文本之前。后台任务可用 `/codex:status <job-id>` 查进度，用 `/codex:result <job-id>` 取结果。
 
 ### 模型设置
 
@@ -107,10 +107,10 @@ cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/codex/SKILL.md ~/.gemini
 /codex:adversarial-review --wait focus on auth checks and error handling
 
 # 让 Codex 排查，但不修改文件
-/codex:rescue 分析测试失败的原因
+/codex --read-only 分析测试失败的原因
 
 # 允许 Codex 修改工作区，在后台运行并返回任务 ID
-/codex:rescue --write --background 修复失败的测试
+/codex --background 修复失败的测试
 
 # 查看任务进度并获取完整审查报告
 /codex:status

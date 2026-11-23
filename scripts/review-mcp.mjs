@@ -14,7 +14,7 @@ const commands = {
   review: ['review', 'Run the official native, read-only Codex review.'],
   adversarial_review: ['adversarial-review', 'Run the official read-only Codex adversarial review.'],
   rescue: ['task', 'Send Codex a coding or investigation task in read-only mode.'],
-  rescue_write: ['task', 'Send Codex a task with workspace write access. Use only when the user explicitly passes --write.'],
+  rescue_write: ['task', 'Send Codex a task with workspace write access. Use for /codex unless --read-only is set, or for /codex:rescue with explicit --write.'],
   status: ['status', 'Read the official Codex job status for this conversation or a specified job.'],
   result: ['result', 'Return the stored official Codex job result.'],
   cancel: ['cancel', 'Cancel the requested active official Codex job.'],
