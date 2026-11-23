@@ -13,6 +13,8 @@ const companion = path.join(root, 'vendor/codex-plugin-cc-v1.0.6/plugins/codex/s
 const commands = {
   review: ['review', 'Run the official native, read-only Codex review.'],
   adversarial_review: ['adversarial-review', 'Run the official read-only Codex adversarial review.'],
+  rescue: ['task', 'Send Codex a coding or investigation task in read-only mode.'],
+  rescue_write: ['task', 'Send Codex a task with workspace write access. Use only when the user explicitly passes --write.'],
   status: ['status', 'Read the official Codex job status for this conversation or a specified job.'],
   result: ['result', 'Return the stored official Codex job result.'],
   cancel: ['cancel', 'Cancel the requested active official Codex job.'],
@@ -25,13 +27,16 @@ const tools = Object.entries(commands).map(([name, [command, description]]) => (
     type: 'object', additionalProperties: false,
     properties: {
       cwd: { type: 'string', description: 'Absolute path of the current workspace.' },
-      arguments: { type: 'string', description: 'The raw slash command argument tail, verbatim; empty if omitted.' },
+      ...(command === 'task' ? {
+        prompt: { type: 'string', description: 'The user’s task text verbatim, excluding the leading rescue flags.' },
+        background: { type: 'boolean', description: 'Queue the task and return its job ID.' },
+      } : { arguments: { type: 'string', description: 'The raw slash command argument tail, verbatim; empty if omitted.' } }),
       conversation_id: { type: 'string', description: 'Exact agy conversation ID from the Codex SessionStart hook.' },
       ...(isReview(command) ? { mode: { enum: ['inspect', 'wait', 'background'], description: 'Inspect only if neither mode flag was supplied and the user has not chosen yet.' } } : {}),
     },
-    required: ['cwd', 'arguments'],
+    required: ['cwd', command === 'task' ? 'prompt' : 'arguments'],
   },
-  annotations: { readOnlyHint: name !== 'cancel', openWorldHint: isReview(command) },
+  annotations: { readOnlyHint: name !== 'cancel' && name !== 'rescue_write', openWorldHint: isReview(command) || command === 'task' },
 }));
 
 const data = process.env.PLUGIN_DATA || path.join(os.homedir(), '.gemini', 'antigravity-cli', 'codex-review-data');
@@ -81,9 +86,23 @@ async function execute(request, signal) {
   const action = request.name;
   if (!Object.hasOwn(commands, action)) throw new Error('Unknown Codex review tool.');
   const [command] = commands[action];
-  const { cwd, arguments: raw, mode, conversation_id: id } = request.arguments ?? {};
-  if (typeof cwd !== 'string' || !path.isAbsolute(cwd) || typeof raw !== 'string' || raw.includes('\0')) {
-    throw new Error('Pass the absolute workspace path and the exact slash-command arguments.');
+  const { cwd, arguments: raw, mode, conversation_id: id, prompt, background: enqueue } = request.arguments ?? {};
+  if (typeof cwd !== 'string' || !path.isAbsolute(cwd) || cwd.includes('\0')) {
+    throw new Error('Pass the absolute path of the requested workspace.');
+  }
+  let argv;
+  if (command === 'task') {
+    if (typeof prompt !== 'string' || !prompt.trim() || prompt.includes('\0')) {
+      throw new Error('Pass the task you want Codex to perform.');
+    }
+    if (enqueue !== undefined && typeof enqueue !== 'boolean') {
+      throw new Error('Pass background as a boolean.');
+    }
+    // Do not parse the prompt as companion options or shell syntax.
+    argv = [...(action === 'rescue_write' ? ['--write'] : []), ...(enqueue ? ['--background'] : []), '--', prompt];
+  } else {
+    if (typeof raw !== 'string' || raw.includes('\0')) throw new Error('Pass the exact slash-command arguments.');
+    argv = [raw];
   }
   if (id !== undefined && (typeof id !== 'string' || !/^[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}$/i.test(id))) {
     throw new Error('Use the conversation UUID provided by agy, or omit it if unavailable.');
@@ -103,10 +122,9 @@ async function execute(request, signal) {
     else background = mode === 'background';
   }
 
-  // Preserve the one raw argument exactly as the official Claude command does.
-  // The companion registers and manages its own jobs, including detached ones.
+  // Review uses the original raw argument; task uses the companion's own queue.
   const env = { ...hostEnv, ...(id ? { CODEX_COMPANION_SESSION_ID: id } : {}) };
-  const child = spawn(process.execPath, [companion, command, raw], {
+  const child = spawn(process.execPath, [companion, command, ...argv], {
     cwd, detached: true, env,
     stdio: background ? 'ignore' : ['ignore', 'pipe', 'pipe'],
   });
@@ -143,7 +161,7 @@ input.on('line', line => {
   if (id == null) return;
   if (method === 'initialize') return send(id, { result: {
     protocolVersion: params.protocolVersion ?? '2024-11-05', capabilities: { tools: {} },
-    serverInfo: { name: 'codex-review-agy-adapter', version: '1.2.0' },
+    serverInfo: { name: 'codex-review-agy-adapter', version: '1.3.0' },
   } });
   if (method === 'ping') return send(id, { result: {} });
   if (method === 'tools/list') return send(id, { result: { tools } });

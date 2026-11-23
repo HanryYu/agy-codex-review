@@ -7,6 +7,8 @@
       "tools": {
         "review": {"eager": true},
         "adversarial_review": {"eager": true},
+        "rescue": {"eager": true},
+        "rescue_write": {"eager": true},
         "status": {"eager": true},
         "result": {"eager": true},
         "cancel": {"eager": true},
