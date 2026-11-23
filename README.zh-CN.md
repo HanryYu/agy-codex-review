@@ -36,13 +36,15 @@ git clone https://github.com/HanryYu/agy-codex-review.git /tmp/agy-codex-review
 agy plugin install /tmp/agy-codex-review
 ```
 
-### 2. 可选：启用 `/review` 快捷命令
+### 2. 可选：启用快捷命令
 
-如果希望在 `agy` 中直接用 `/review` 作为 `/codex:review` 的快捷方式：
+在 `agy` 中用 `/review` 代替 `/codex:review`，用 `/codex` 代替 `/codex:rescue`：
 
 ```bash
 mkdir -p ~/.gemini/antigravity-cli/skills/review
 cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/review/SKILL.md ~/.gemini/antigravity-cli/skills/review/SKILL.md
+mkdir -p ~/.gemini/antigravity-cli/skills/codex
+cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/codex/SKILL.md ~/.gemini/antigravity-cli/skills/codex/SKILL.md
 ```
 
 ### 3. 验证安装
@@ -64,6 +66,7 @@ cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/review/SKILL.md ~/.gemin
 | `/codex:review [options]` | 执行原生只读代码审查 |
 | `/codex:adversarial-review [options] [focus]` | 执行对抗式审查（可附加审查重点） |
 | `/codex:rescue [--write] [--background] <任务>` | 把任务直接交给 Codex。默认只读，`--write` 允许修改工作区。 |
+| `/codex [--write] [--background] <任务>` | `/codex:rescue` 的可选快捷命令，参数和权限相同。 |
 | `/codex:status [job-id]` | 查看当前仓库的任务列表或单个任务状态 |
 | `/codex:result [job-id]` | 查看已完成任务的完整结果 |
 | `/codex:cancel [job-id]` | 取消正在运行的 Codex 任务 |

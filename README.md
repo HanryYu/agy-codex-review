@@ -36,13 +36,15 @@ git clone https://github.com/HanryYu/agy-codex-review.git /tmp/agy-codex-review
 agy plugin install /tmp/agy-codex-review
 ```
 
-### 2. Optional: Enable `/review` Shortcut
+### 2. Optional: Enable Shortcuts
 
-To use `/review` as a shorthand for `/codex:review` in `agy`:
+To use `/review` for `/codex:review` and `/codex` for `/codex:rescue` in `agy`:
 
 ```bash
 mkdir -p ~/.gemini/antigravity-cli/skills/review
 cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/review/SKILL.md ~/.gemini/antigravity-cli/skills/review/SKILL.md
+mkdir -p ~/.gemini/antigravity-cli/skills/codex
+cp ~/.gemini/config/plugins/codex/extras/agy-cli/skills/codex/SKILL.md ~/.gemini/antigravity-cli/skills/codex/SKILL.md
 ```
 
 ### 3. Verify Setup
@@ -64,6 +66,7 @@ All commands are explicitly invoked as slash commands in `agy`:
 | `/codex:review [options]` | Run a native read-only Codex review |
 | `/codex:adversarial-review [options] [focus]` | Run an adversarial review with optional focus text |
 | `/codex:rescue [--write] [--background] <task>` | Send a task to Codex. Read-only by default; `--write` enables workspace edits. |
+| `/codex [--write] [--background] <task>` | Optional shorthand for `/codex:rescue`; same flags and permissions. |
 | `/codex:status [job-id]` | Show active/recent jobs for this repo, or details for one job |
 | `/codex:result [job-id]` | Show the full stored result of a completed job |
 | `/codex:cancel [job-id]` | Cancel a running Codex job |
